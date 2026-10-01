@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Fundamentos de Windows Forms con C#</title>
+<style>
+:root{--bg:#f1ecfa;--win:#fffdfa;--ink:#3b3654;--mute:#6f698a;--bar:#bcd7f4;--barink:#34406b;--line:#ddd4ee;--sel:#d5f1e4;--code:#fdf3e3;--codeink:#4a4463;--acc:#8b9fe0;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.6 "Segoe UI",system-ui,sans-serif}
+.win{max-width:1100px;margin:16px auto;background:var(--win);border:1px solid var(--line);box-shadow:0 8px 24px rgba(120,100,170,.18)}
+.title{background:var(--bar);color:var(--barink);display:flex;align-items:center;justify-content:space-between;padding:8px 12px;font-size:14px}
+.title b{font-weight:600}
+.btns{display:flex;gap:2px}
+.btns span{width:28px;text-align:center;opacity:.85}
+.menu{display:flex;gap:4px;padding:4px 8px;border-bottom:1px solid var(--line);font-size:14px;flex-wrap:wrap}
+.menu button{background:none;border:0;color:var(--ink);padding:4px 10px;font:inherit;cursor:pointer}
+.menu button:hover{background:var(--sel)}
+.body{display:grid;grid-template-columns:230px 1fr;min-height:560px}
+.tool{border-right:1px solid var(--line);padding:10px 0;background:var(--bg)}
+.tool h2{font-size:13px;margin:10px 12px 4px;color:var(--mute);font-weight:600}
+.tool button{display:block;width:100%;text-align:left;background:none;border:0;color:var(--ink);padding:6px 14px;font:inherit;font-size:14px;cursor:pointer;border-left:3px solid transparent}
+.tool button:hover{background:var(--sel)}
+.tool button[aria-current="true"]{background:var(--sel);border-left-color:var(--acc);font-weight:600}
+button:focus-visible{outline:2px solid var(--acc);outline-offset:-2px}
+main{padding:24px 28px;min-width:0}
+main h1{font-size:28px;margin:0 0 4px;line-height:1.2}
+.sub{color:var(--mute);margin:0 0 20px;max-width:68ch}
+main p{max-width:70ch}
+h3{font-size:16px;margin:24px 0 8px}
+.tags{display:flex;flex-wrap:wrap;gap:6px;margin:0;padding:0;list-style:none}
+.tags li{border:1px solid var(--line);padding:2px 10px;font:13px Consolas,monospace;background:var(--bg)}
+.ev li{margin:4px 0}
+pre{background:var(--code);color:var(--codeink);padding:14px 16px;overflow-x:auto;font:13.5px/1.55 Consolas,"Cascadia Mono",monospace;margin:8px 0;border-left:3px solid var(--acc)}
+.tip{background:#fff6d9!important;border:1px solid var(--line);border-left:3px solid #f0c987;background:var(--bg);padding:10px 14px;max-width:70ch;margin-top:20px;font-size:15px}
+.pager{display:flex;justify-content:space-between;margin-top:28px;gap:8px}
+.pager button{background:var(--bg);border:1px solid var(--line);color:var(--ink);padding:8px 14px;font:inherit;cursor:pointer}
+.pager button:hover{background:var(--sel)}
+.status{border-top:1px solid var(--line);padding:4px 12px;font-size:12px;color:var(--mute);display:flex;justify-content:space-between}
+@media(max-width:760px){.body{grid-template-columns:1fr}.tool{border-right:0;border-bottom:1px solid var(--line);display:flex;overflow-x:auto;padding:0}.tool h2{display:none}.tool button{width:auto;white-space:nowrap;border-left:0;border-bottom:3px solid transparent}.tool button[aria-current="true"]{border-bottom-color:var(--acc)}main{padding:18px 16px}.win{margin:0}}
+</style>
+</head>
+<body>
+<div class="win">
+  <div class="title"><b>Fundamentos de Windows Forms (C#)</b><span class="btns"><span>–</span><span>□</span><span>✕</span></span></div>
+  <div class="menu"><button id="ini">Ir al inicio</button></div>
+  <div class="body">
+    <nav class="tool" id="nav" aria-label="Temas"></nav>
+    <main id="main" tabindex="-1"></main>
+  </div>
+  <div class="status"><span id="st"></span><span>.NET · Visual Studio</span></div>
+</div>
+
+<script>
+var T=[
+// ---------- CONCEPTOS ----------
+{g:"Conceptos",n:"¿Qué es Windows Forms?",d:"Biblioteca de .NET para crear aplicaciones de escritorio con ventanas, botones y cuadros de texto.",
+ p:["Windows Forms (WinForms) te permite construir interfaces gráficas arrastrando controles desde el Cuadro de herramientas hacia un formulario. Visual Studio genera el código por ti y tú escribes la lógica en C#.","Una aplicación WinForms es una app dirigida por eventos: el programa espera a que el usuario haga algo (clic, escribir, cerrar) y responde ejecutando métodos."],
+ c:"using System;\nusing System.Windows.Forms;\n\nstatic class Program\n{\n    [STAThread]\n    static void Main()\n    {\n        ApplicationConfiguration.Initialize();\n        Application.Run(new Form1()); // abre la ventana principal\n    }\n}",
+ tip:"Para empezar: Visual Studio → Crear proyecto → «Aplicación de Windows Forms» (C#)."},
+{g:"Conceptos",n:"Estructura del proyecto",d:"Qué archivos crea Visual Studio y para qué sirve cada uno.",
+ p:["Program.cs contiene Main, el punto de entrada. Form1.cs guarda tu código. Form1.Designer.cs guarda el código que genera el diseñador visual; no lo edites a mano. Form1.resx guarda recursos como imágenes y textos.","Form1 es una clase parcial (partial class): su código se reparte entre Form1.cs y Form1.Designer.cs."],
+ c:"public partial class Form1 : Form\n{\n    public Form1()\n    {\n        InitializeComponent(); // crea y configura los controles\n    }\n}",
+ tip:"Si borras un evento solo del .cs, el diseñador sigue apuntando a él y la app no compila. Quítalo también desde el panel Propiedades."},
+{g:"Conceptos",n:"Formulario (Form)",d:"La ventana. Todos los controles viven dentro de un formulario.",
+ p:["Un Form es la clase base de toda ventana. Se configura con propiedades y reacciona a eventos propios como Load y FormClosing."],
+ pr:["Text","Size","StartPosition","FormBorderStyle","MaximizeBox","BackColor","Icon","AcceptButton","CancelButton"],
+ ev:["Load: al cargar el formulario","Shown: al mostrarse por primera vez","FormClosing: antes de cerrar (se puede cancelar)","Resize: al cambiar de tamaño"],
+ c:"private void Form1_Load(object sender, EventArgs e)\n{\n    this.Text = \"Mi primera app\";\n    this.StartPosition = FormStartPosition.CenterScreen;\n}\n\nprivate void Form1_FormClosing(object sender, FormClosingEventArgs e)\n{\n    var r = MessageBox.Show(\"¿Salir?\", \"Confirmar\",\n            MessageBoxButtons.YesNo);\n    if (r == DialogResult.No) e.Cancel = true;\n}"},
+{g:"Conceptos",n:"Propiedades, métodos y eventos",d:"Los tres elementos que tiene todo control.",
+ p:["Propiedades describen cómo es el control (Text, Enabled, Visible). Métodos son acciones que puede hacer (Focus(), Clear(), Show()). Eventos avisan que algo ocurrió (Click, TextChanged).","Se pueden cambiar en el panel Propiedades en tiempo de diseño, o desde el código en tiempo de ejecución."],
+ c:"button1.Text = \"Guardar\";    // propiedad\nbutton1.Enabled = false;    // propiedad\ntextBox1.Clear();           // método\ntextBox1.Focus();           // método"},
+{g:"Conceptos",n:"Eventos y manejadores",d:"Cómo conectar una acción del usuario con tu código.",
+ p:["Un manejador de eventos (event handler) es un método que se ejecuta cuando ocurre un evento. Siempre recibe dos parámetros: sender (el control que lo disparó) y e (datos del evento).","Haz doble clic en un control para crear su evento predeterminado, o usa el rayo ⚡ del panel Propiedades para elegir otro."],
+ c:"// Designer.cs conecta el evento con el método:\nthis.button1.Click += new System.EventHandler(this.button1_Click);\n\n// Form1.cs: tu lógica\nprivate void button1_Click(object sender, EventArgs e)\n{\n    MessageBox.Show(\"¡Hola!\");\n}\n\n// Un mismo manejador para varios controles:\nprivate void Botones_Click(object sender, EventArgs e)\n{\n    var b = (Button)sender;\n    MessageBox.Show(\"Pulsaste \" + b.Text);\n}"},
+{g:"Conceptos",n:"Diseño y posicionamiento",d:"Anchor, Dock y contenedores para que la ventana se adapte.",
+ p:["Anchor fija las distancias de un control a los bordes del formulario. Dock lo pega a un borde y lo estira. AutoSize ajusta el tamaño al contenido.","Los contenedores (Panel, GroupBox, FlowLayoutPanel, TableLayoutPanel, TabControl) agrupan controles y organizan su disposición."],
+ pr:["Anchor","Dock","AutoSize","Margin","Padding","TabIndex","Location","MinimumSize"],
+ c:"textBox1.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;\ndataGridView1.Dock = DockStyle.Fill;\nflowLayoutPanel1.FlowDirection = FlowDirection.LeftToRight;"},
+{g:"Conceptos",n:"Tipos de datos y conversión",d:"Los controles trabajan con texto; debes convertirlo.",
+ p:["Text siempre es string. Para operar con números convierte con Parse o, mejor, TryParse, que no lanza excepción si el usuario escribe algo inválido."],
+ c:"if (int.TryParse(txtEdad.Text, out int edad))\n{\n    lblResultado.Text = (edad + 1).ToString();\n}\nelse\n{\n    MessageBox.Show(\"Escribe un número entero.\");\n}"},
+{g:"Conceptos",n:"Validación y errores",d:"Evita que datos incorrectos rompan tu programa.",
+ p:["Valida antes de usar los datos: campos vacíos, rangos, formatos. Usa try-catch para operaciones que pueden fallar (archivos, bases de datos). ErrorProvider muestra un icono de error junto al control."],
+ c:"if (string.IsNullOrWhiteSpace(txtNombre.Text))\n{\n    errorProvider1.SetError(txtNombre, \"El nombre es obligatorio\");\n    return;\n}\nerrorProvider1.Clear();\n\ntry\n{\n    decimal precio = decimal.Parse(txtPrecio.Text);\n}\ncatch (FormatException)\n{\n    MessageBox.Show(\"Precio no válido\");\n}"},
+{g:"Conceptos",n:"Varios formularios",d:"Abrir, pasar datos y cerrar otras ventanas.",
+ p:["Show() abre un formulario sin bloquear el anterior. ShowDialog() lo abre como modal: el usuario debe cerrarlo antes de continuar, y devuelve un DialogResult."],
+ c:"var f2 = new FormDetalle();\nf2.Cliente = txtNombre.Text;      // propiedad pública para pasar datos\nif (f2.ShowDialog() == DialogResult.OK)\n{\n    lblEstado.Text = \"Guardado\";\n}"},
+// ---------- CONTROLES ----------
+{g:"Controles",n:"Label",d:"Muestra texto que el usuario no edita.",
+ p:["Sirve para títulos, instrucciones y resultados."],
+ pr:["Text","Font","ForeColor","AutoSize","TextAlign"],
+ c:"lblTotal.Text = \"Total: \" + total.ToString(\"C2\");\nlblTotal.ForeColor = Color.Green;"},
+{g:"Controles",n:"Button",d:"Ejecuta una acción al hacer clic.",
+ p:["Es el control más usado. Con AcceptButton y CancelButton del formulario, Enter y Esc activan botones automáticamente."],
+ pr:["Text","Enabled","DialogResult","FlatStyle","Image"],
+ ev:["Click: clic del usuario","MouseEnter / MouseLeave: cursor entra o sale"],
+ c:"private void btnSumar_Click(object sender, EventArgs e)\n{\n    double a = double.Parse(txtA.Text);\n    double b = double.Parse(txtB.Text);\n    lblRes.Text = (a + b).ToString();\n}"},
+{g:"Controles",n:"TextBox",d:"Entrada de texto de una o varias líneas.",
+ p:["Para contraseñas usa PasswordChar o UseSystemPasswordChar. Para varias líneas activa Multiline. MaskedTextBox aplica formatos como teléfonos o fechas."],
+ pr:["Text","MaxLength","Multiline","PasswordChar","ReadOnly","PlaceholderText"],
+ ev:["TextChanged: cambia el texto","KeyPress: se presiona una tecla","Leave: pierde el foco"],
+ c:"// Aceptar solo dígitos\nprivate void txtEdad_KeyPress(object sender, KeyPressEventArgs e)\n{\n    if (!char.IsDigit(e.KeyChar) && !char.IsControl(e.KeyChar))\n        e.Handled = true; // bloquea la tecla\n}"},
+{g:"Controles",n:"CheckBox y RadioButton",d:"Opciones múltiples (casillas) y opción única (círculos).",
+ p:["Los CheckBox son independientes entre sí. Los RadioButton de un mismo contenedor (GroupBox o Panel) forman un grupo donde solo uno puede estar marcado."],
+ pr:["Checked","Text","CheckState","ThreeState"],
+ ev:["CheckedChanged: cambia el estado"],
+ c:"if (chkAcepto.Checked && rbMujer.Checked)\n    lblInfo.Text = \"Acepta y es mujer\";\n\nbtnEnviar.Enabled = chkAcepto.Checked;"},
+{g:"Controles",n:"ComboBox y ListBox",d:"Listas de elementos para elegir.",
+ p:["ComboBox es una lista desplegable; con DropDownStyle = DropDownList el usuario solo elige, no escribe. ListBox muestra varios elementos a la vez y puede permitir selección múltiple."],
+ pr:["Items","SelectedItem","SelectedIndex","DataSource","SelectionMode","Sorted"],
+ ev:["SelectedIndexChanged: cambia la selección"],
+ c:"cmbPais.Items.AddRange(new[] { \"México\", \"Chile\", \"España\" });\ncmbPais.SelectedIndex = 0;\n\nlstTareas.Items.Add(txtTarea.Text);\nif (lstTareas.SelectedIndex >= 0)\n    lstTareas.Items.RemoveAt(lstTareas.SelectedIndex);"},
+{g:"Controles",n:"NumericUpDown y DateTimePicker",d:"Entrada controlada de números y fechas.",
+ p:["Evitan errores de formato porque el usuario no puede escribir valores inválidos. NumericUpDown define mínimo, máximo e incremento."],
+ pr:["Minimum","Maximum","Value","Format","MinDate","MaxDate"],
+ c:"int cantidad = (int)numCantidad.Value;\nDateTime fecha = dtpNacimiento.Value;\nint edad = DateTime.Today.Year - fecha.Year;"},
+{g:"Controles",n:"DataGridView",d:"Tabla para mostrar y editar datos.",
+ p:["Se enlaza a listas o tablas con DataSource, o se llena fila por fila. Es el control habitual para mostrar resultados de una base de datos."],
+ pr:["DataSource","Columns","Rows","SelectionMode","ReadOnly","AllowUserToAddRows"],
+ ev:["CellClick","CellValueChanged","SelectionChanged"],
+ c:"dgv.Columns.Add(\"colNombre\", \"Nombre\");\ndgv.Columns.Add(\"colEdad\", \"Edad\");\ndgv.Rows.Add(\"Ana\", 21);\n\n// O enlazar una lista:\ndgv.DataSource = listaAlumnos;"},
+{g:"Controles",n:"Menús y barras",d:"MenuStrip, ToolStrip y StatusStrip.",
+ p:["MenuStrip crea la barra de menús; ToolStrip, una barra de botones; StatusStrip, la barra de estado inferior. Cada elemento es un ToolStripMenuItem con su propio evento Click."],
+ c:"private void salirToolStripMenuItem_Click(object sender, EventArgs e)\n{\n    Application.Exit();\n}\n\ntoolStripStatusLabel1.Text = \"Listo\";"},
+{g:"Controles",n:"Contenedores",d:"Panel, GroupBox, TabControl y TableLayoutPanel.",
+ p:["Panel agrupa sin título y puede tener scroll. GroupBox agrupa con un título. TabControl organiza el contenido en pestañas. TableLayoutPanel acomoda controles en filas y columnas."],
+ pr:["Controls","AutoScroll","BorderStyle","TabPages"],
+ c:"foreach (Control c in panel1.Controls)\n{\n    if (c is TextBox t) t.Clear();\n}"},
+{g:"Controles",n:"PictureBox",d:"Muestra imágenes.",
+ pr:["Image","SizeMode","ImageLocation"],
+ p:["SizeMode = Zoom conserva la proporción de la imagen."],
+ c:"pictureBox1.SizeMode = PictureBoxSizeMode.Zoom;\npictureBox1.Image = Image.FromFile(@\"C:\\fotos\\logo.png\");"},
+{g:"Controles",n:"Timer",d:"Ejecuta código cada cierto tiempo.",
+ p:["No es visible en el formulario. Interval está en milisegundos; actívalo con Start() y deténlo con Stop()."],
+ pr:["Interval","Enabled"],ev:["Tick: se cumple el intervalo"],
+ c:"timer1.Interval = 1000; // 1 segundo\ntimer1.Start();\n\nprivate void timer1_Tick(object sender, EventArgs e)\n{\n    lblHora.Text = DateTime.Now.ToString(\"HH:mm:ss\");\n}"},
+{g:"Controles",n:"MessageBox y diálogos",d:"Mensajes, confirmaciones y selectores de archivos.",
+ p:["MessageBox.Show muestra avisos y pide confirmaciones. OpenFileDialog, SaveFileDialog y ColorDialog permiten al usuario elegir archivos y colores."],
+ c:"var r = MessageBox.Show(\"¿Eliminar registro?\", \"Confirmar\",\n        MessageBoxButtons.YesNo, MessageBoxIcon.Question);\nif (r == DialogResult.Yes) { /* eliminar */ }\n\nusing var dlg = new OpenFileDialog { Filter = \"Texto|*.txt\" };\nif (dlg.ShowDialog() == DialogResult.OK)\n    txtContenido.Text = File.ReadAllText(dlg.FileName);"}
+];
+var cur=0,nav=document.getElementById('nav'),main=document.getElementById('main');
+function el(t,c,x){var e=document.createElement(t);if(c)e.className=c;if(x!=null)e.textContent=x;return e}
+(function(){var g="";T.forEach(function(t,i){if(t.g!==g){g=t.g;nav.appendChild(el('h2',0,g))}var b=el('button',0,t.n);b.onclick=function(){show(i)};nav.appendChild(b);t.b=b})})();
+function show(i){cur=i;var t=T[i];T.forEach(function(x){x.b.removeAttribute('aria-current')});t.b.setAttribute('aria-current','true');
+main.textContent='';main.appendChild(el('h1',0,t.n));main.appendChild(el('p','sub',t.d));
+t.p.forEach(function(p){main.appendChild(el('p',0,p))});
+if(t.pr){main.appendChild(el('h3',0,'Propiedades clave'));var u=el('ul','tags');t.pr.forEach(function(x){u.appendChild(el('li',0,x))});main.appendChild(u)}
+if(t.ev){main.appendChild(el('h3',0,'Eventos importantes'));var l=el('ul','ev');t.ev.forEach(function(x){l.appendChild(el('li',0,x))});main.appendChild(l)}
+if(t.c){main.appendChild(el('h3',0,'Ejemplo en C#'));main.appendChild(el('pre')).appendChild(el('code',0,t.c))}
+if(t.tip)main.appendChild(el('div','tip',t.tip));
+var pg=el('div','pager'),a=el('button',0,'‹ Anterior'),n=el('button',0,'Siguiente ›');
+a.onclick=function(){show(Math.max(0,cur-1))};n.onclick=function(){show(Math.min(T.length-1,cur+1))};
+pg.appendChild(i>0?a:el('span'));pg.appendChild(i<T.length-1?n:el('span'));main.appendChild(pg);
+document.getElementById('st').textContent=t.g+' · '+(i+1)+' de '+T.length;window.scrollTo(0,0)}
+document.getElementById('ini').onclick=function(){show(0)};
+show(0);
+</script>
+</body>
+</html>
